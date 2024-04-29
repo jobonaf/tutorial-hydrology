@@ -1,2 +1,4 @@
 ^tutorialhydrology\.Rproj$
 ^\.Rproj\.user$
+inst/tutorials/intro/rsconnect
+^LICENSE\.md$
