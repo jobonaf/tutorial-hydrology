@@ -39,11 +39,15 @@ Modify the following code to limit the number of rows printed to 5:
 mtcars
 ```
 
+```{r print-limit-hint}
+head(mtcars, n=5)
+```
+
 ### Quiz
 
 Some questions to verify that you know the purposes of various base and recommended R packages:
 
-```{r quiz}
+```{r quiz-1}
 quiz(
   question("Which packages contain functions for installing other R packages?",
     answer("tools"),
@@ -56,16 +60,56 @@ quiz(
     answer("tools"),
     answer("stats"),
     answer("ggplot2", correct = TRUE)
-  )
+  ), caption=""
 )
 ```
 
 
-## explore the data
+## arrange the data
 
 ### read data from XLSX files
 
-Read a file located at `inst/extdata/data_C202.xlsx`. You need the `readxl` package; here it is already pre-loaded.
-```{r read-xlsx, exercise=TRUE}
+Try reading the second sheet of a file located at `data/data_C202.xlsx`, skipping the first line. You need the `readxl` package. 
 
+```{r read-xlsx, exercise=TRUE}
+library(readxl)
+dat <- read_xlsx("data/data_C202.xlsx", sheet=1, skip=0)
+dat
 ```
+
+### explore the dataset
+
+If you need a summary of the dataset, functions `dim`, `str` and `summary` are good choices. Here you can try them. Consider that metadata and data are pre-loaded in objects `anag` and `dat`.
+
+```{r prepare-data, include=FALSE}
+anag <- read_xlsx("data/data_C202.xlsx", sheet=1, skip=1)
+dat <- read_xlsx("data/data_C202.xlsx", sheet=2, skip=1)
+```
+
+```{r data-summary, exercise=TRUE, exercise.setup = "prepare-data"}
+str(dat)
+```
+
+Now you should be able to answer to a couple of questions
+
+```{r quiz-2}
+quiz(
+  question("What is the maximum stage detected by the sensor (cm)?",
+    answer(28),
+    answer(102, correct = TRUE),
+    answer(535)
+  ),
+  question("What is the average temperature of the water (°C)?",
+    answer(10.76, correct = TRUE),
+    answer(10),
+    answer(14)
+  ),
+  question("In which municipality is located the station?",
+    answer("Tagliamento"),
+    answer("Cleulis"),
+    answer("But"),
+    answer("Paluzza", correct = TRUE)
+  ), caption=""
+)
+```
+
