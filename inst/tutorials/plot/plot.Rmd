@@ -1,0 +1,22 @@
+---
+title: "Plot the data"
+output: learnr::tutorial
+runtime: shiny_prerendered
+---
+
+```{r setup, include=FALSE}
+library(learnr)
+library(ggplot2)
+load("data/obs_discharge.rda")
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+
+## a larger dataset
+
+Now we have a larger dataset, named `obs_discharge`.
+
+```{r explore-data, exercise=TRUE}
+obs_discharge
+```
+
