@@ -13,7 +13,7 @@ A data frame with 9768 rows and 20 columns:
 \item{Unit}{Unit}
 \item{Value}{Value}
 \item{IdMeasure}{ID of the measure}
-\item{Date}{Date}
+\item{Date}{Day of sampling}
 \item{TimeStart}{Begin of sampling time}
 \item{TimeEnd}{End of sampling time}
 \item{NoBranches}{Number of river's branches at the time of the measure}
@@ -33,12 +33,13 @@ A data frame with 9768 rows and 20 columns:
 }
 }
 \source{
-"Casagrande Giacomo \href{mailto:giacomo.casagrande@regione.fvg.it}{giacomo.casagrande@regione.fvg.it} "
+Regione Autonoma Friuli Venezia Giulia -- \href{https://www.regione.fvg.it/rafvg/cms/RAFVG/ambiente-territorio/tutela-ambiente-gestione-risorse-naturali/FOGLIA202/}{Servizio Gestione Risorse Idriche}
 }
 \usage{
 obs_discharge
 }
 \description{
-Observed discharge data 2004-2024 provided by Autonomous Region FVG (Servizio Gestione Risorse Idriche)
+Observed discharge, stage, temperature and flow speed data 2004-2024 provided
+by Autonomous Region FVG (Servizio Gestione Risorse Idriche)
 }
 \keyword{datasets}
