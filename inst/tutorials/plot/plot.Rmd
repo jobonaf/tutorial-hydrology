@@ -7,16 +7,199 @@ runtime: shiny_prerendered
 ```{r setup, include=FALSE}
 library(learnr)
 library(ggplot2)
+library(dplyr)
+library(lubridate)
+library(tidyr)
 load("data/obs_discharge.rda")
 knitr::opts_chunk$set(echo = FALSE)
 ```
 
+This tutorial is one of the four created in May 2024 by [Giovanni Bonafè](https://www.linkedin.com/in/giovannibonafe/) for the __6th Workshop on Water Resources in Developing Countries__ at ICTP in Trieste, Italy. Source code is available [here](https://github.com/jobonaf/tutorialhydrology).
 
-## a larger dataset
+I suggest you do the tutorials in this order:
 
-Now we have a larger dataset, named `obs_discharge`.
+1. [introduction](https://jobonaf.shinyapps.io/tutorialhydrology-intro/) to R and to the hydrological data 
+2. [plot](https://jobonaf.shinyapps.io/tutorialhydrology-plot/) the hydrological data 
+3. [fit](https://jobonaf.shinyapps.io/tutorialhydrology-fit/) the rating curve 
+4. [estimate](https://jobonaf.shinyapps.io/tutorialhydrology-estimate/) the discharge using the fitted rating curve 
+
+
+## explore a larger dataset
+
+Now we have a larger dataset, named `obs_discharge`. It has been built by merging and rearranging data from 19 stations, in the same format as the XLSX file we have already seen in the first tutorial [Introduction](https://jobonaf.shinyapps.io/tutorialhydrology-intro/).
+Let's explore the dataset with functions `colnames`, `dim`, `str` and `summary`.
 
 ```{r explore-data, exercise=TRUE}
-obs_discharge
+
+colnames(obs_discharge)
+
+```
+
+With package `dplyr` (here pre-loaded) you can `filter`, `group_by` and `summarize` the data. These and other functions can be concatenated with the pipe operator `%>%`.
+
+```{r filter-data, exercise=TRUE}
+
+obs_discharge %>%
+  filter(Variable=="Q") %>%
+  group_by(River, StationCode) %>%
+  summarize(v=max(Value))
+
+```
+
+Try to answer to these questions. Consider adding `%>% arrange(desc(v))` in order to sort the final table by column `v`. 
+
+```{r quiz-1}
+quiz(
+  question("Which is the station where the maximum discharge has been measured?",
+           answer("Fiume Isonzo"),
+           answer("N021", correct = TRUE),
+           answer("NO21")
+  ),
+  question("Which is the station where the maximum stage has been measured by the sensor?",
+           answer("Fiume Meduna"),
+           answer("N021"),
+           answer("A323", correct = TRUE)
+  )
+  , caption=""
+)
+```
+
+## time series plots
+
+Here we plot the time series of the measured data. First we choose the discharge `Q` of the station `N021`.
+
+```{r timeseries-1, exercise=TRUE}
+
+dat <- obs_discharge %>% filter(Variable=="Q", StationCode=="N021")
+ggplot(data = dat, mapping = aes(x=Date, y=Value)) +
+  geom_point()
+
+```
+
+Now try with other variables and other stations. You can change or add other geometries (`geom_line`, `geom_col`).
+You can also plot two or more variables (or stations) and use the `color` to distinguish them from each other.
+
+```{r timeseries-2, exercise=TRUE}
+
+dat <- obs_discharge %>% filter(Variable %in% c("H","Q"), StationCode=="N021")
+ggplot(dat, aes(x=Date, y=Value, color=Variable)) +
+  geom_point()
+
+```
+Another way to distinguish the variables or the stations are the `facet_*` functions. Here you see an example. 
+
+```{r timeseries-3, exercise=TRUE}
+
+dat <- obs_discharge %>% filter(StationCode=="N021")
+ggplot(data = dat, mapping = aes(x=Date, y=Value)) +
+  facet_wrap("Variable")+
+  geom_point()
+
+```
+
+```{r quiz-2}
+quiz(
+  question("How can you rescale the y axis of each panel according to the values of each variable, keeping the x scale the same for each panel?",
+           answer("scale='free'"),
+           answer("scale='free_y'", correct = TRUE),
+           answer("free_y=TRUE")
+  )
+  , caption=""
+)
+```
+
+## box and whiskers plots
+
+Box and whiskers plots are used to show distributions of numeric data values, especially when you want to compare them between multiple groups. 
+
+```{r boxplot-1, exercise=TRUE}
+
+dat <- obs_discharge %>% filter(Variable=="Q")
+ggplot(dat, aes(y=StationCode, x=Value)) +
+  geom_boxplot()
+
+```
+
+With function `mutate` you can add a new column to your dataset. With package `lubridate` (here pre-loaded) you have function `month`, so you can add the month to the dataset. Now plot the new dataset, using the month as `group`, so that you represent the annual course of the observed discharge.
+
+```{r boxplot-2, exercise=TRUE, exercise.eval=TRUE}
+
+dat <- obs_discharge %>% 
+  filter(Variable=="Q", StationCode=="N021") %>%
+  mutate(Month=month(Date))
+dat
+
+```
+
+```{r boxplot-2-hint}
+
+dat <- obs_discharge %>% 
+  filter(Variable=="Q", StationCode=="N021") %>%
+  mutate(Month=month(Date))
+ggplot(dat, aes(x=Month, y=Value, group=Month)) +
+  geom_boxplot() +
+  scale_x_continuous(breaks=1:12, label=month.abb)
+
+```
+
+### exercise
+
+Compare the annual course of different stations and/or of different variables. Give your own interpretation to the results.
+
+## reshape the data
+
+In our dataset each row contains the value of a different variable ("long" or ["narrow" format](https://en.wikipedia.org/wiki/Wide_and_narrow_data#Narrow)).
+
+: Example of "long" table
+
+|Date | Station | Variable | Value|
+|:--|:--|:--|:--|
+|12/3 | A1      | Q        | 23.1|
+|12/3 | A1      | H        | 1.7|
+|12/3 | A1      | T        | 8.1|
+
+You may want to compare two variables with a scatter plot, so you need to reshape the dataset in order to get one distinct column for each variable (["wide" format](https://en.wikipedia.org/wiki/Wide_and_narrow_data#Wide)). 
+
+: Example of "wide" table
+
+|Date | Station | Q    | H    | T    |
+|:--|:--|:--|:--|:--|
+|12/3 | A1      | 23.1 | 1.7  | 8.1  |
+
+To achieve this goal, function `pivot_wider` of package `tidyr` is right for you.
+
+
+```{r reshape, exercise=TRUE, exercise.eval=TRUE}
+
+obs_discharge %>% 
+  pivot_wider(id_cols = c(TimeStart, StationCode), 
+              names_from = Variable, 
+              values_from = Value)
+
+```
+
+## scatter plot
+
+Now, after reshaping the data, you have a `data.frame` with one distinct column for each measured variable. On a single row you have simultaneous measures. So you should be able to build a scatter plot with discharge `Q` vs stage `H`. In the Cartesian plane a point will represents a pair _(H,Q)_.
+
+```{r scatter, exercise=TRUE}
+
+obs_discharge %>% 
+  pivot_wider(id_cols = c(TimeStart, StationCode), 
+              names_from = Variable, 
+              values_from = Value) -> dat
+
+```
+
+```{r scatter-hint}
+
+obs_discharge %>% 
+  filter(Variable %in% c("Q","H"), StationCode %in% c("N021","A323"))%>% 
+  pivot_wider(id_cols = c(TimeStart, StationCode), 
+              names_from = Variable, 
+              values_from = Value) -> dat
+ggplot(dat, aes(x=H, y=Q, col=StationCode)) +
+  geom_point()
+
 ```
 

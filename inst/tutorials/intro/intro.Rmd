@@ -10,6 +10,15 @@ library(readxl)
 knitr::opts_chunk$set(echo = FALSE)
 ```
 
+This tutorial is one of the four created in May 2024 by [Giovanni Bonafè](https://www.linkedin.com/in/giovannibonafe/) for the __6th Workshop on Water Resources in Developing Countries__ at ICTP in Trieste, Italy. Source code is available [here](https://github.com/jobonaf/tutorialhydrology).
+
+I suggest you do the tutorials in this order:
+
+1. [introduction](https://jobonaf.shinyapps.io/tutorialhydrology-intro/) to R and to the hydrological data 
+2. [plot](https://jobonaf.shinyapps.io/tutorialhydrology-plot/) the hydrological data 
+3. [fit](https://jobonaf.shinyapps.io/tutorialhydrology-fit/) the rating curve 
+4. [estimate](https://jobonaf.shinyapps.io/tutorialhydrology-estimate/) the discharge using the fitted rating curve 
+
 
 ## first steps with R
 
@@ -26,9 +35,11 @@ Write the R code required to add two plus two:
 Now write a function that adds any two numbers and then call it:
 
 ```{r add-function, exercise=TRUE, exercise.lines = 5}
+
 add <- function() {
   
 }
+
 ```
 
 ### Exercise 3
@@ -36,7 +47,9 @@ add <- function() {
 Modify the following code to limit the number of rows printed to 5:
 
 ```{r print-limit, exercise=TRUE, exercise.eval=TRUE}
+
 mtcars
+
 ```
 
 ```{r print-limit-hint}
@@ -45,21 +58,25 @@ head(mtcars, n=5)
 
 ### Quiz
 
-Some questions to verify that you know the purposes of various base and recommended R packages:
-
 ```{r quiz-1}
 quiz(
   question("Which packages contain functions for installing other R packages?",
-    answer("tools"),
-    answer("utils", correct = TRUE),
-    answer("remote", correct = TRUE),
-    answer("codetools")
+           answer("tools"),
+           answer("utils", correct = TRUE),
+           answer("remote", correct = TRUE),
+           answer("codetools")
   ),
   question("Which of the R packages listed below are used to create plots?",
-    answer("lattice", correct = TRUE),
-    answer("tools"),
-    answer("stats"),
-    answer("ggplot2", correct = TRUE)
+           answer("lattice", correct = TRUE),
+           answer("tools"),
+           answer("stats"),
+           answer("ggplot2", correct = TRUE)
+  ),
+  question("Which of the following assign value 5 to object A?",
+           answer("A = 2 + 3", correct = TRUE),
+           answer("2 + 3 = A"),
+           answer("2 + 3 -> A", correct = TRUE),
+           answer("A <- 2 + 3", correct = TRUE)
   ), caption=""
 )
 ```
@@ -72,9 +89,11 @@ quiz(
 Try reading the second sheet of a file located at `data/data_C202.xlsx`, skipping the first line. You need the `readxl` package. 
 
 ```{r read-xlsx, exercise=TRUE}
+
 library(readxl)
 dat <- read_xlsx("data/data_C202.xlsx", sheet=1, skip=0)
 dat
+
 ```
 
 ### explore the dataset
@@ -82,12 +101,16 @@ dat
 If you need a summary of the dataset, functions `dim`, `str` and `summary` are good choices. Here you can try them. Consider that metadata and data are pre-loaded in objects `anag` and `dat`.
 
 ```{r prepare-data, include=FALSE}
+
 anag <- read_xlsx("data/data_C202.xlsx", sheet=1, skip=1)
 dat <- read_xlsx("data/data_C202.xlsx", sheet=2, skip=1)
+
 ```
 
 ```{r data-summary, exercise=TRUE, exercise.setup = "prepare-data"}
+
 str(dat)
+
 ```
 
 Now you should be able to answer to a couple of questions

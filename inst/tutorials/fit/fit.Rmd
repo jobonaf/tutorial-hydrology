@@ -1,0 +1,72 @@
+---
+title: "Fit a rating curve"
+output: learnr::tutorial
+runtime: shiny_prerendered
+---
+
+```{r setup, include=FALSE}
+library(ggplot2)
+library(dplyr)
+library(tidyr)
+library(bdrc)
+load("data/obs_discharge.rda")
+load("data/obs_n105.rda")
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+This tutorial is one of the four created in May 2024 by [Giovanni Bonafè](https://www.linkedin.com/in/giovannibonafe/) for the __6th Workshop on Water Resources in Developing Countries__ at ICTP in Trieste, Italy. Source code is available [here](https://github.com/jobonaf/tutorialhydrology).
+
+I suggest you do the tutorials in this order:
+
+1. [introduction](https://jobonaf.shinyapps.io/tutorialhydrology-intro/) to R and to the hydrological data 
+2. [plot](https://jobonaf.shinyapps.io/tutorialhydrology-plot/) the hydrological data 
+3. [fit](https://jobonaf.shinyapps.io/tutorialhydrology-fit/) the rating curve 
+4. [estimate](https://jobonaf.shinyapps.io/tutorialhydrology-estimate/) the discharge using the fitted rating curve 
+
+## fit a curve on a scatter plot
+
+We have already seen how to prepare the data so that it is suitable for a scatter plot. In this example we see three stations. We distinguish them using different colors. Use `geom_smooth` to add a curve fitting the data.
+
+```{r scatter, exercise=TRUE, exercise.eval=TRUE}
+
+obs_discharge %>% 
+  filter(Variable %in% c("Q","H"), StationCode %in% c("N021","A323","C503"))%>% 
+  pivot_wider(id_cols = c(TimeStart, StationCode), 
+              names_from = Variable, 
+              values_from = Value) -> dat
+ggplot(dat, aes(x=H, y=Q, col=StationCode)) +
+  geom_point()
+
+```
+
+```{r scatter-hint}
+obs_discharge %>% 
+  filter(Variable %in% c("Q","H"), StationCode %in% c("N021","A323","C503"))%>% 
+  pivot_wider(id_cols = c(TimeStart, StationCode), 
+              names_from = Variable, 
+              values_from = Value) -> dat
+ggplot(dat, aes(x=H, y=Q, col=StationCode)) +
+  geom_point()+
+  geom_smooth(method="gam")
+```
+
+### exercise 1
+
+Test different `method`s for `geom_smooth`. Which ones seem the most suitable to you?
+
+### exercise 2
+
+Using `facet_wrap('StationCode')` instead of the color to distinguish the stations, you can plot them all together. Given the variability of H and Q between the various stations, make an appropriate choice for the `scale` parameter. Which stations would you __exclude__ from a rating curve fitting procedure based on this data? why?
+
+Alternatively, which pre-processing of the data would you suggest?
+
+## fit a rating curve
+
+We will use R package `bdrc` to fit a rating curve with a bayesian approach. That's quite expensive in terms of computing resources, so if you do this tutorial interactively on shinyapps.io, please focus only on station _N105_, so as not to exceed the limit of available computing resources. The `data.frame` `obs_n105` is ready for this purpose.
+
+
+```{r fit-1}
+
+fitted <- gplm(Q~H, data=obs_n105) 
+
+```

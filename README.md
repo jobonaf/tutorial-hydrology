@@ -1,9 +1,4 @@
----
-title: tutorialhydrology
-author: Giovanni Bonafè giovanni.bonafe@arpa.fvg.it
-date: 2024-05-23
----
-
+# tutorialhydrology
 R tutorials for the __6th Workshop on Water Resources in Developing Countries__ at ICTP in Trieste, Italy.
 
 ### tutorials online
@@ -22,8 +17,8 @@ You can also download the tutorials and run them locally in your R/Rstudio sessi
 - R ($\ge$ 3.5.2)
 - RStudio
 - R packages*
-  - _mandatory_: shiny ($\ge$ 1.6.0), learnr, readxl, ggplot2, bdrc
-  - _recommended_: dplyr, tidyr, readr, lubridate, remote
+  - _mandatory_: shiny ($\ge$ 1.6.0), learnr, readxl, dplyr, ggplot2, bdrc
+  - _recommended_: tidyr, readr, lubridate, remote
   
 *) You can install R packages directly from within R/RStudio with `install.packages(<package-name>)`. To check if they are already installed and available, use `library(<package-name>)`
 
@@ -54,4 +49,4 @@ rsconnect::deployDoc(
 )
 ```
 
-This option is useful if you work behind a proxy. In any case, publishing your own tutorials is not among the objectives of the workshop.
+This option is useful if you work behind a proxy. In any case, publishing your own tutorials is beyond the objectives of the workshop.
