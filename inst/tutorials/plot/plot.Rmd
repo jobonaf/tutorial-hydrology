@@ -1,5 +1,7 @@
 ---
 title: "Plot the data"
+author: G.Bonafè
+date: 2024-05-23
 output: learnr::tutorial
 runtime: shiny_prerendered
 ---
@@ -14,7 +16,7 @@ load("data/obs_discharge.rda")
 knitr::opts_chunk$set(echo = FALSE)
 ```
 
-This tutorial is one of the four created in May 2024 by [Giovanni Bonafè](https://www.linkedin.com/in/giovannibonafe/) for the __6th Workshop on Water Resources in Developing Countries__ at ICTP in Trieste, Italy. Source code is available [here](https://github.com/jobonaf/tutorialhydrology).
+This tutorial is one of the four created in May 2024 for the __6th Workshop on Water Resources in Developing Countries__ at ICTP in Trieste, Italy. Source code is available [here](https://github.com/jobonaf/tutorialhydrology).
 
 I suggest you do the tutorials in this order:
 
@@ -24,7 +26,7 @@ I suggest you do the tutorials in this order:
 4. [estimate](https://jobonaf.shinyapps.io/tutorialhydrology-estimate/) the discharge using the fitted rating curve 
 
 
-## explore a larger dataset
+## Explore a larger dataset
 
 Now we have a larger dataset, named `obs_discharge`. It has been built by merging and rearranging data from 19 stations, in the same format as the XLSX file we have already seen in the first tutorial [Introduction](https://jobonaf.shinyapps.io/tutorialhydrology-intro/).
 Let's explore the dataset with functions `colnames`, `dim`, `str` and `summary`.
@@ -64,7 +66,7 @@ quiz(
 )
 ```
 
-## time series plots
+## Time series plots
 
 Here we plot the time series of the measured data. First we choose the discharge `Q` of the station `N021`.
 
@@ -108,7 +110,7 @@ quiz(
 )
 ```
 
-## box and whiskers plots
+## Box and whiskers plots
 
 Box and whiskers plots are used to show distributions of numeric data values, especially when you want to compare them between multiple groups. 
 
@@ -133,20 +135,18 @@ dat
 
 ```{r boxplot-2-hint}
 
-dat <- obs_discharge %>% 
-  filter(Variable=="Q", StationCode=="N021") %>%
-  mutate(Month=month(Date))
+# add the following lines:
 ggplot(dat, aes(x=Month, y=Value, group=Month)) +
   geom_boxplot() +
   scale_x_continuous(breaks=1:12, label=month.abb)
 
 ```
 
-### exercise
+### Exercise
 
 Compare the annual course of different stations and/or of different variables. Give your own interpretation to the results.
 
-## reshape the data
+## Reshape the data
 
 In our dataset each row contains the value of a different variable ("long" or ["narrow" format](https://en.wikipedia.org/wiki/Wide_and_narrow_data#Narrow)).
 
@@ -178,7 +178,7 @@ obs_discharge %>%
 
 ```
 
-## scatter plot
+## Scatter plot
 
 Now, after reshaping the data, you have a `data.frame` with one distinct column for each measured variable. On a single row you have simultaneous measures. So you should be able to build a scatter plot with discharge `Q` vs stage `H`. In the Cartesian plane a point will represents a pair _(H,Q)_.
 
