@@ -1,5 +1,7 @@
 ---
 title: "Introduction"
+author: G.Bonafè
+date: 2024-05-23
 output: learnr::tutorial
 runtime: shiny_prerendered
 ---
@@ -10,7 +12,7 @@ library(readxl)
 knitr::opts_chunk$set(echo = FALSE)
 ```
 
-This tutorial is one of the four created in May 2024 by [Giovanni Bonafè](https://www.linkedin.com/in/giovannibonafe/) for the __6th Workshop on Water Resources in Developing Countries__ at ICTP in Trieste, Italy. Source code is available [here](https://github.com/jobonaf/tutorialhydrology).
+This tutorial is one of the four created in May 2024 for the __6th Workshop on Water Resources in Developing Countries__ at ICTP in Trieste, Italy. Source code is available [here](https://github.com/jobonaf/tutorialhydrology).
 
 I suggest you do the tutorials in this order:
 
@@ -20,7 +22,7 @@ I suggest you do the tutorials in this order:
 4. [estimate](https://jobonaf.shinyapps.io/tutorialhydrology-estimate/) the discharge using the fitted rating curve 
 
 
-## first steps with R
+## First steps with R
 
 ### Exercise 1
 
@@ -82,9 +84,9 @@ quiz(
 ```
 
 
-## arrange the data
+## Arrange the data
 
-### read data from XLSX files
+### Read data from XLSX files
 
 Try reading the second sheet of a file located at `data/data_C202.xlsx`, skipping the first line. You need the `readxl` package. 
 
@@ -96,7 +98,7 @@ dat
 
 ```
 
-### explore the dataset
+### Explore the dataset
 
 If you need a summary of the dataset, functions `dim`, `str` and `summary` are good choices. Here you can try them. Consider that metadata and data are pre-loaded in objects `anag` and `dat`.
 
