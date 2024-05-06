@@ -1,0 +1,203 @@
+---
+title: "Explore the stage time series, estimate the hourly discharge"
+author: G.Bonafè
+date: 2024-05-23
+output: learnr::tutorial
+runtime: shiny_prerendered
+---
+
+```{r setup, include=FALSE}
+library(learnr)
+library(ggplot2)
+library(dplyr)
+library(tidyr)
+library(lubridate)
+library(changepoint)
+library(bdrc)
+load("data/hourly_n105.rda")
+load("data/fitted.rda")
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+This tutorial is one of the four created in May 2024 for the __6th Workshop on Water Resources in Developing Countries__ at ICTP in Trieste, Italy. Source code is available [here](https://github.com/jobonaf/tutorialhydrology).
+
+I suggest you do the tutorials in this order:
+
+1. [introduction](https://jobonaf.shinyapps.io/tutorialhydrology-intro/) to R and to the hydrological data 
+2. [plot](https://jobonaf.shinyapps.io/tutorialhydrology-plot/) the hydrological data 
+3. [fit](https://jobonaf.shinyapps.io/tutorialhydrology-fit/) the rating curve 
+4. [estimate](https://jobonaf.shinyapps.io/tutorialhydrology-estimate/) the discharge using the fitted rating curve 
+
+## Explore the stage time series
+
+Once fitted, the rating curve serves as a functional representation of the relationship between water level and discharge. To apply the rating curve, you simply input the observed water level at a specific time into the curve equation, which then outputs the corresponding estimated discharge. This process allows you to convert sporadic water level observations into continuous discharge values, thus extending the data series to create a continuous hourly time series of discharge. This continuous record enables more accurate and reliable analysis for various hydrological and water management purposes, including flood forecasting, drought monitoring, and water resource planning.
+
+For the station N105, we can analyze the data starting from 2003 to 2023, here available in `hourly_n105`. Try to calculate some percentiles, with function `quantile`.
+
+
+```{r ts-1, exercise=TRUE}
+
+summary(hourly_n105)
+
+```
+
+```{r ts-1-hint}
+
+quantile(
+  x = hourly_n105$H,           # numeric vector whose sample quantiles are wanted
+  probs=c(0,0.25,0.5,0.75,1),  # numeric vector of probabilities with values in [0,1]
+  na.rm=T)                     # any NAs are removed from x before the quantiles are computed.
+
+```
+
+The package `lubridate` help us adding some useful columns. The values of `hour`, `month` and `year` can help us analyzing the daily and annual courses, and the multi-annual trend.
+
+```{r ts-2, exercise=TRUE, exercise.eval=TRUE}
+
+ggplot(hourly_n105 %>% mutate(month=month(datetime)),
+       aes(x=month, y=H, group=month))+
+  geom_boxplot() +
+  scale_x_continuous(breaks=1:12, label=month.abb)
+
+```
+
+### Exercise
+Discuss the results of the analysis. 
+
+## Detect changepoints
+
+In a time series, a changepoint refers to a specific point in time where there is a significant change in the underlying behavior or characteristics of the data. These changes can manifest in various ways, such as alterations in the mean, variance, trend, seasonality, or other structural properties of the time series.
+
+Changepoints can occur for a variety of reasons, including shifts in the underlying process generating the data, external interventions or events affecting the system being observed, or changes in measurement techniques or instruments.
+
+We will use package `changepoint` to find one or more changepoints in the `hourly_n105` time series. First, we need to filter out missing values (`NA`s). Then we will use function `cpt.mean` to detect the changepoints.
+
+```{r changepoint-1, exercise=TRUE}
+
+df <- hourly_n105 %>% filter(!is.na(H))
+
+```
+
+```{r changepoint-1-hint}
+
+# add the following lines:
+cp <- cpt.mean(df$H)
+cp@cpts
+plot(cp)
+
+```
+
+### Quiz
+
+```{r quiz-1}
+quiz(
+  question("How many changepoint did you found?",
+    answer(0),
+    answer(2),
+    answer(1, correct = TRUE)
+  ),  
+  question("How big is the biggest jump in the time series?",
+    answer("36.2 cm"),
+    answer("17.9 cm", correct = TRUE),
+    answer("9.2 cm")
+  ),  
+  question("When did the first changepoint occur?",
+    answer("2009-06-09", correct = TRUE),
+    answer("2009-05-21"),
+    answer("2023-08-04")
+  ), caption=""
+)
+```
+
+
+### Discussion
+In light of these results, you believe that the rating curve should be recalibrated? How would you proceed?
+
+
+## Estimate the hourly discharge with the fitted rating curves
+
+Here we will ignore the results of the changepoint analysis and apply the same rating curve to the entire time series of hourly stage data. As in the previous tutorial, four rating curves are stored in objects `plm.fit`, `plm0.fit`, `gplm.fit` and `gplm0.fit`. Package `bdrc` has been pre-loaded, so you just need to `predict` the discharge (see `help(predict.plm0)`). First, we need to filter out missing values (`NA`s).
+
+### Exercise 1
+How would you modify the input dataset to skip the error? 
+
+```{r predict-1, exercise=TRUE}
+
+df <- hourly_n105 %>% filter(!is.na(H))
+predict(plm0.fit, newdata=df$H)
+
+```
+
+```{r predict-1-hint}
+
+# add the following condition to the filter:
+H < max(plm0.fit$data$H)
+
+```
+
+### Exercise 2
+How would you extrapolate the rating curve in the calibration phase beyond the maximum level measured in the calibration dataset?  (Hint: see `help(plm)`)
+
+
+## Compare different estimations
+
+### Exercise 1
+Compare the distributions of the estimated discharge before and after the changepoint. Discuss the result.
+
+```{r compare-1, exercise=TRUE}
+
+df <- hourly_n105 %>% 
+  filter(!is.na(H),                # filter out NAs
+         H < max(plm0.fit$data$H)) # filter out high H values
+cp <- cpt.mean(df$H)               # detect changepoint
+
+```
+
+```{r compare-1-hint}
+
+# add the following lines:
+Qest <- predict(plm0.fit, newdata=df$H) # prediction
+Qest <- Qest$median                     # keep only the median value
+cp1 <- cp@cpts[1]                       # first changepoint
+Q_before <- Qest[1:cp1]                 # Q before the changepoint
+Q_after  <- Qest[(cp1+1):length(Qest)]  # Q after the changepoint
+quantile(Q_before, c(0.1,0.9))          # 10th and 90th percentiles before...
+quantile(Q_after,  c(0.1,0.9))          # ...and after the changepoint
+
+```
+
+### Exercise 2
+Compare the distributions of the estimated discharge produced with two of the 4 rating curves. Discuss the result.
+
+```{r compare-2, exercise=TRUE}
+
+df <- hourly_n105 %>% 
+  filter(!is.na(H),                             # filter out NAs
+         H < max(plm0.fit$data$H))              # filter out high H values
+Qplm0 <- predict(plm0.fit, newdata=df$H)$median # prediction with the simplest...
+Qgplm <- predict(gplm.fit, newdata=df$H)$median # ...and with the more complex fit
+
+```
+
+```{r compare-2-hint}
+
+# add the following lines:
+quantile(Qplm0, c(0.1,0.9))  # 10th and 90th percentiles with the simplest...
+quantile(Qgplm, c(0.1,0.9))  # ...and with the more complex fit
+
+```
+
+# References
+Birgir Hrafnkelsson, Solvi Rognvaldsson, Axel Orn Jansson and Rafael Vias (2021). _bdrc: Bayesian Discharge Rating Curves._ R package version 1.0.0. https://CRAN.R-project.org/package=bdrc
+
+Hrafnkelsson, B., Sigurdarson, H., and Gardarsson, S. M. (2022). _Generalization of the power-law rating curve using hydrodynamic theory and Bayesian hierarchical modeling_, Environmetrics, 33(2):e2711.
+
+Gelman, A., Carlin, J. B., Stern, H. S., Dunson, D. B., Vehtari, A., and Rubin, D. B. (2013). _Bayesian Data Analysis, Third Edition._ Chapman & Hall/CRC Texts in Statistical Science. Taylor & Francis.
+
+Killick R, Eckley IA (2014). “changepoint: An R Package for Changepoint Analysis.” _Journal of Statistical
+Software_, *58*(3), 1-19. https://www.jstatsoft.org/article/view/v058i03
+
+Killick R, Haynes K, Eckley IA (2022). _changepoint: An R package for changepoint analysis_. R package version
+2.2.4, https://CRAN.R-project.org/package=changepoint
+
+
