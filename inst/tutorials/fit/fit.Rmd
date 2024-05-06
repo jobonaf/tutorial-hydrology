@@ -1,20 +1,24 @@
 ---
 title: "Fit a rating curve"
+author: G.Bonafè
+date: 2024-05-23
 output: learnr::tutorial
 runtime: shiny_prerendered
 ---
 
 ```{r setup, include=FALSE}
+library(learnr)
 library(ggplot2)
 library(dplyr)
 library(tidyr)
 library(bdrc)
 load("data/obs_discharge.rda")
 load("data/obs_n105.rda")
+load("data/fitted.rda")
 knitr::opts_chunk$set(echo = FALSE)
 ```
 
-This tutorial is one of the four created in May 2024 by [Giovanni Bonafè](https://www.linkedin.com/in/giovannibonafe/) for the __6th Workshop on Water Resources in Developing Countries__ at ICTP in Trieste, Italy. Source code is available [here](https://github.com/jobonaf/tutorialhydrology).
+This tutorial is one of the four created in May 2024 for the __6th Workshop on Water Resources in Developing Countries__ at ICTP in Trieste, Italy. Source code is available [here](https://github.com/jobonaf/tutorialhydrology).
 
 I suggest you do the tutorials in this order:
 
@@ -23,7 +27,7 @@ I suggest you do the tutorials in this order:
 3. [fit](https://jobonaf.shinyapps.io/tutorialhydrology-fit/) the rating curve 
 4. [estimate](https://jobonaf.shinyapps.io/tutorialhydrology-estimate/) the discharge using the fitted rating curve 
 
-## fit a curve on a scatter plot
+## Fit a curve on a scatter plot
 
 We have already seen how to prepare the data so that it is suitable for a scatter plot. In this example we see three stations. We distinguish them using different colors. Use `geom_smooth` to add a curve fitting the data.
 
@@ -40,33 +44,86 @@ ggplot(dat, aes(x=H, y=Q, col=StationCode)) +
 ```
 
 ```{r scatter-hint}
-obs_discharge %>% 
-  filter(Variable %in% c("Q","H"), StationCode %in% c("N021","A323","C503"))%>% 
-  pivot_wider(id_cols = c(TimeStart, StationCode), 
-              names_from = Variable, 
-              values_from = Value) -> dat
-ggplot(dat, aes(x=H, y=Q, col=StationCode)) +
-  geom_point()+
-  geom_smooth(method="gam")
+
+# add this:
++ geom_smooth(method="gam")
+
 ```
 
-### exercise 1
+### Exercise 1
 
 Test different `method`s for `geom_smooth`. Which ones seem the most suitable to you?
 
-### exercise 2
+### Exercise 2
 
 Using `facet_wrap('StationCode')` instead of the color to distinguish the stations, you can plot them all together. Given the variability of H and Q between the various stations, make an appropriate choice for the `scale` parameter. Which stations would you __exclude__ from a rating curve fitting procedure based on this data? why?
 
 Alternatively, which pre-processing of the data would you suggest?
 
-## fit a rating curve
+## Fit the rating curves
 
-We will use R package `bdrc` to fit a rating curve with a bayesian approach. That's quite expensive in terms of computing resources, so if you do this tutorial interactively on shinyapps.io, please focus only on station _N105_, so as not to exceed the limit of available computing resources. The `data.frame` `obs_n105` is ready for this purpose.
+Rating curves are essential for extending sporadic discharge observations to a continuous hourly time series because they provide a mathematical relationship between water level (stage) and discharge (flow rate). By establishing this relationship through rating curves, we can estimate discharge at any given time based on continuous water level measurements. This allows us to bridge the gaps between sporadic observations and create a continuous record of discharge, crucial for various applications such as hydrological modeling, water resource management, and flood forecasting.
 
+We used R package `bdrc` to fit a rating curve with a Bayesian approach. That's quite expensive in terms of computing resources, so here we focus only on station _N105_. The `data.frame` `obs_n105` is ready for this purpose, except that `H` must be converted from cm to m.
 
-```{r fit-1}
+```{r fit-1, eval=FALSE, echo=TRUE}
 
-fitted <- gplm(Q~H, data=obs_n105) 
+d <- obs_n105 %>% mutate(H=H/100)
 
 ```
+
+The `bdrc` package includes four different models to fit a discharge rating curve of different complexities. These are:
+
+`plm0()` - Power-law model with a constant error variance. This is a Bayesian hierarchical implementation of the most commonly used discharge rating curve model in hydrological practice.
+
+`plm()` - Power-law model with error variance that varies with water elevation.
+
+`gplm0()` - Generalized power-law model with a constant error variance. 
+
+`gplm()` - Generalized power-law model with error variance that varies with water elevation. 
+
+If you do this tutorial interactively on shinyapps.io, do __not__ fit the models, so as not to exceed the limit of available computing resources. Four rating curves have already been fitted as follows
+
+
+```{r fit-2, eval=FALSE, echo=TRUE}
+
+plm.fit   <- plm(  Q~H, data=d)
+plm0.fit  <- plm0( Q~H, data=d)
+gplm.fit  <- gplm( Q~H, data=d)
+gplm0.fit <- gplm0(Q~H, data=d)
+
+```
+
+## Compare the rating curves
+
+The `tournament` is a model comparison method that uses the Widely Applicable Information Criterion (WAIC) (see Watanabe, 2010) to select the most appropriate of the four models given the data. The WAIC consists of two terms, a measure of the goodness-of-fit, and a penalizing term to account for model complexity (effective number of parameters).
+
+```{r compare-1, exercise=TRUE}
+
+tournament(plm0.fit,plm.fit,gplm0.fit,gplm.fit)
+
+```
+
+```{r quiz-1}
+quiz(
+  question("Which is the winner?",
+    answer("gplm.fit"),
+    answer("gplm0.fit"),
+    answer("plm.fit"),
+    answer("plm0.fit", correct = TRUE)
+  ), caption=""
+)
+```
+
+
+### Exercise
+
+Discuss the result of the tournament. See more [here](https://sor16.github.io/bdrc/articles/tournament.html).
+
+
+## References
+Hrafnkelsson, B., Sigurdarson, H., and Gardarsson, S. M. (2022). _Generalization of the power-law rating curve using hydrodynamic theory and Bayesian hierarchical modeling_, Environmetrics, 33(2):e2711.
+
+Gelman, A., Carlin, J. B., Stern, H. S., Dunson, D. B., Vehtari, A., and Rubin, D. B. (2013). _Bayesian Data Analysis, Third Edition._ Chapman & Hall/CRC Texts in Statistical Science. Taylor & Francis.
+
+Watanabe, S. (2010). _Asymptotic equivalence of Bayes cross validation and widely applicable information criterion in singular learning theory_. Journal of Machine Learning Research, 11, 3571–3594.
