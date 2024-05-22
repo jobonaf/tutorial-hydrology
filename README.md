@@ -40,7 +40,7 @@ You can play with the tutorials interactively in your browser without downloadin
 4. __estimate__ the discharge using the fitted rating curve: https://jobonaf.shinyapps.io/tutorialhydrology-estimate/
 
 ### do the tutorials locally
-You can also download the tutorials and run them locally in your R/Rstudio session.
+You can also download the tutorials and run them locally in your Rstudio session.
 
 #### requirements
 
@@ -71,6 +71,20 @@ Then have a look to the description of the dataset, with command
 ```
 help(tutorialhydrology)
 ``` 
+
+### datasets
+
+The package contains three datasets, accessible with command `data(<dataset-name>)`:
+
+- __hourly_n105__ Hourly stage data at station N105. A data frame with 176034 rows and 2 columns:
+  + _datetime_ Time of observation
+  + _H_ Stage level (m)
+- __obs_discharge__ Observed hydrological data. A data frame with 9768 rows and 20 columns: _Variable, Unit, Value, IdMeasure, Date, TimeStart, TimeEnd, NoBranches_ (Number of river's branches at the time of the measure)_, Instrument, Method, NotesMeasure, StationCode, Municipality, Province, Location, River, Basin, SubBasin, Description, NotesStation_. Includes the following variables measured in 19 stations: T_water, H, H_bridge, H_rod, H_select, Q, section_area, section_width, depth_ave, depth_max, speed_ave, speed_max.
+- __obs_n105__	Observed discharge data at station N105 (Torre river in Tarcento). A data frame with 29 rows and 4 columns:
+  + _TimeStart_ Begin of sampling time
+  + _StationCode_ ID of the station
+  + _H_ Stage level (cm)
+  + _Q_ River discharge ($m^3/s$)
 
 ---
 ### publish your own tutorial
