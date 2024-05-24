@@ -61,6 +61,8 @@ You can install R packages directly from within R/RStudio with `install.packages
 
 Install the R package, load it and launch the tutorials.
 ```r
+library(learnr)
+library(remotes)
 install_github("jobonaf/tutorialhydrology")
 library(tutorialhydrology)
 run_tutorial(package = "tutorialhydrology", name = "intro")
