@@ -32,18 +32,18 @@ R tutorials for the **6th Workshop on Water Resources in Developing Countries** 
    - Changepoints detection
 8. **Estimating discharge with the rating curves**
 
-## Do the Tutorials Online
+## Option 1: Do the Tutorials Online
 
-You can interactively play with the tutorials in your browser without downloading anything:
+You can interactively play with the tutorials in your browser without downloading anything. This option is recommended for beginners.
 
 1. [Introduction to R and to the hydrological data](https://jobonaf.shinyapps.io/tutorialhydrology-intro/)
 2. [Plot the hydrological data](https://jobonaf.shinyapps.io/tutorialhydrology-plot/)
 3. [Fit the rating curve](https://jobonaf.shinyapps.io/tutorialhydrology-fit/)
 4. [Estimate the discharge using the fitted rating curve](https://jobonaf.shinyapps.io/tutorialhydrology-estimate/)
 
-## Do the Tutorials Locally
+## Option 2: Install the Package and Do the Tutorials Locally
 
-You can also download the tutorials and run them locally in your RStudio session.
+You can also install the R package `tutorialhydrology` and run the tutorials locally in your RStudio session. This option is recommended for those who know R or want to learn it.
 
 ### Requirements
 
@@ -57,6 +57,26 @@ You can install R packages directly from within R/RStudio with `install.packages
 
 ### Instructions
 
+Install the R package, load it and launch the tutorials.
+```r
+install_github("jobonaf/tutorialhydrology")
+library(tutorialhydrology)
+run_tutorial(package = "tutorialhydrology", name = "intro")
+run_tutorial(package = "tutorialhydrology", name = "plot")
+run_tutorial(package = "tutorialhydrology", name = "fit")
+run_tutorial(package = "tutorialhydrology", name = "estimate")
+```
+
+## Option 3: Clone the Repository and Do the Tutorials Locally
+
+You can also clone the repository `tutorialhydrology` from GitHub, build the package and then run the tutorials locally. This option is only possible for advanced R users.
+
+### Requirements
+
+The same requirements as option 2 apply, plus `git`.
+
+### Instructions
+
 1. **Clone from GitHub**
    - Use the command `git clone https://github.com/jobonaf/tutorialhydrology.git` in your shell, or
    - In RStudio: _File > New Project > Version Control > Git_, or
@@ -65,19 +85,13 @@ You can install R packages directly from within R/RStudio with `install.packages
 3. **Navigate the tutorials** in the _Tutorial_ pane and launch the one you are interested in.
 4. If you want, you can modify them in the folder `inst/tutorials` and rebuild the package.
 
-## Ignore the Tutorials and Work with the Datasets
 
-If you have some experience with R and prefer not to use RStudio, install the package from within an R session with the command:
-```r
-remotes::install_github("jobonaf/tutorialhydrology")
-```
-Then, view the dataset descriptions with the command:
+## Work with the Datasets
+
+If you choose options 2 or 3, you can view the dataset descriptions with the command
 ```r
 help(tutorialhydrology)
 ```
-
-## Datasets
-
 The package contains three datasets, accessible with the command `data(<dataset-name>)`:
 
 - **hourly_n105**: Hourly stage data at station N105. A data frame with 176034 rows and 2 columns:
@@ -91,10 +105,12 @@ The package contains three datasets, accessible with the command `data(<dataset-
   - `StationCode`: ID of the station
   - `H`: Stage level (cm)
   - `Q`: River discharge ($m^3/s$)
+  
+After installing the package and accessing the datasets, you can write your own scripts based on the datasets. Have fun!
 
 ---
 
-## Publish Your Own Tutorial
+## Addendum: Publish Your Own Tutorial
 
 To deploy/publish a tutorial on your shinyapps.io account, use the _Publish_ button provided by the package `rsconnect` in RStudio. Alternatively, in an R session, try the following code:
 ```r
@@ -109,4 +125,3 @@ rsconnect::deployDoc(
   appTitle="<webpage-title>"
 )
 ```
-This option is useful if you work behind a proxy. In any case, publishing your own tutorials is beyond the objectives of the workshop.
