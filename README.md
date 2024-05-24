@@ -2,6 +2,8 @@
 
 R tutorials for the **6th Workshop on Water Resources in Developing Countries** at ICTP in Trieste, Italy.
 
+You have three options to complete the tutorials. Regardless of the method you choose, you are expected to achieve the specified goals. Options 2 and 3 offer opportunities to delve deeper into the topics by working with the datasets in your own R scripts.
+
 ## Goals
 
 1. **First steps in R**
@@ -34,7 +36,7 @@ R tutorials for the **6th Workshop on Water Resources in Developing Countries** 
 
 ## Option 1: Do the Tutorials Online
 
-You can interactively play with the tutorials in your browser without downloading anything. This option is recommended for beginners.
+You can interactively engage with the tutorials directly in your browser without needing to download anything. This option is ideal for beginners.
 
 1. [Introduction to R and to the hydrological data](https://jobonaf.shinyapps.io/tutorialhydrology-intro/)
 2. [Plot the hydrological data](https://jobonaf.shinyapps.io/tutorialhydrology-plot/)
@@ -43,7 +45,7 @@ You can interactively play with the tutorials in your browser without downloadin
 
 ## Option 2: Install the Package and Do the Tutorials Locally
 
-You can also install the R package `tutorialhydrology` and run the tutorials locally in your RStudio session. This option is recommended for those who know R or want to learn it.
+You can install the R package tutorialhydrology and run the tutorials locally in your RStudio session. This is recommended for those who are familiar with R or are keen to learn it.
 
 ### Requirements
 
@@ -73,7 +75,7 @@ You can also clone the repository `tutorialhydrology` from GitHub, build the pac
 
 ### Requirements
 
-The same requirements as option 2 apply, plus `git`.
+The same as option 2, plus `git`.
 
 ### Instructions
 
@@ -106,7 +108,7 @@ The package contains three datasets, accessible with the command `data(<dataset-
   - `H`: Stage level (cm)
   - `Q`: River discharge ($m^3/s$)
   
-After installing the package and accessing the datasets, you can write your own scripts based on the datasets. Have fun!
+These datasets allow you to write your own scripts and perform further analyses. Enjoy exploring!
 
 ---
 
