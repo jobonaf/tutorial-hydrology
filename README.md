@@ -45,7 +45,7 @@ You can interactively engage with the tutorials directly in your browser without
 
 ## Option 2: Install the Package and Do the Tutorials Locally
 
-You can install the R package tutorialhydrology and run the tutorials locally in your RStudio session. This is recommended for those who are familiar with R or are keen to learn it.
+You can install the R package `tutorialhydrology` and run the tutorials locally in your RStudio session. This is recommended for those who are familiar with R or are keen to learn it.
 
 ### Requirements
 
