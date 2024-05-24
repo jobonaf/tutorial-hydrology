@@ -1,6 +1,6 @@
 Package: tutorialhydrology
 Title: Tutorials for the 6th Workshop on Water Resources in Developing Countries
-Version: 0.0.0.9000
+Version: 0.0.1
 Authors@R: 
     person("Giovanni", "Bonafe", , "giovanni.bonafe@arpa.fvg.it", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0002-7815-8866"))
